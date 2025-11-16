@@ -4,9 +4,33 @@ const { verifyToken, requireAuth } = require('../middleware/auth');
 const router = express.Router();
 
 /**
- * @route GET /api/v1/visits
- * @desc Get user's doctor visits
- * @access Private
+ * @swagger
+ * /api/v1/visits:
+ *   get:
+ *     tags: [Doctor Visits]
+ *     summary: Get all doctor visits
+ *     description: Retrieve all doctor visits for the authenticated user
+ *     security:
+ *       - bearerAuth: []
+ *     responses:
+ *       200:
+ *         description: Doctor visits retrieved successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   type: boolean
+ *                   example: true
+ *                 data:
+ *                   type: array
+ *                   items:
+ *                     $ref: '#/components/schemas/DoctorVisit'
+ *       401:
+ *         $ref: '#/components/responses/UnauthorizedError'
+ *       500:
+ *         $ref: '#/components/responses/ServerError'
  */
 router.get('/', verifyToken, requireAuth, async (req, res) => {
   try {
@@ -26,9 +50,66 @@ router.get('/', verifyToken, requireAuth, async (req, res) => {
 });
 
 /**
- * @route POST /api/v1/visits
- * @desc Create new doctor visit
- * @access Private
+ * @swagger
+ * /api/v1/visits:
+ *   post:
+ *     tags: [Doctor Visits]
+ *     summary: Create new doctor visit record
+ *     description: Record a new doctor visit for the authenticated user
+ *     security:
+ *       - bearerAuth: []
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - doctor_name
+ *               - visit_date
+ *             properties:
+ *               doctor_name:
+ *                 type: string
+ *                 example: Dr. Sarah Johnson
+ *               specialty:
+ *                 type: string
+ *                 example: Cardiology
+ *               visit_date:
+ *                 type: string
+ *                 format: date-time
+ *                 example: 2024-01-15T10:30:00Z
+ *               diagnosis:
+ *                 type: string
+ *                 example: Mild hypertension
+ *               notes:
+ *                 type: string
+ *                 example: Patient advised to reduce salt intake
+ *               follow_up_date:
+ *                 type: string
+ *                 format: date
+ *                 example: 2024-02-15
+ *     responses:
+ *       201:
+ *         description: Visit recorded successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   type: boolean
+ *                   example: true
+ *                 message:
+ *                   type: string
+ *                   example: Visit recorded successfully
+ *                 data:
+ *                   $ref: '#/components/schemas/DoctorVisit'
+ *       400:
+ *         $ref: '#/components/responses/ValidationError'
+ *       401:
+ *         $ref: '#/components/responses/UnauthorizedError'
+ *       500:
+ *         $ref: '#/components/responses/ServerError'
  */
 router.post('/', verifyToken, requireAuth, async (req, res) => {
   try {

@@ -12,6 +12,8 @@ const logger = require('./utils/logger');
 const { createRedisClient } = require('./config/redis');
 const { Sequelize } = require('sequelize');
 const dbConfig = require('./config/database');
+const swaggerUi = require('swagger-ui-express');
+const swaggerSpec = require('./config/swagger');
 
 // Initialize Express
 const app = express();
@@ -67,6 +69,13 @@ const initializeRedis = async () => {
   }
 };
 
+// Swagger API Documentation
+app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec, {
+  explorer: true,
+  customCss: '.swagger-ui .topbar { display: none }',
+  customSiteTitle: 'HealthSync API Documentation',
+}));
+
 // API Routes
 app.use('/api/v1/auth', require('./routes/auth.routes'));
 app.use('/api/v1/users', require('./routes/users.routes'));
@@ -76,7 +85,33 @@ app.use('/api/v1/appointments', require('./routes/appointments.routes'));
 app.use('/api/v1/pharmacies', require('./routes/pharmacies.routes'));
 app.use('/api/v1/medicines', require('./routes/medicines.routes'));
 
-// Health check endpoint
+/**
+ * @swagger
+ * /health:
+ *   get:
+ *     tags: [Health]
+ *     summary: Health check endpoint
+ *     description: Check if the API server is running and healthy
+ *     responses:
+ *       200:
+ *         description: Server is healthy
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 status:
+ *                   type: string
+ *                   example: OK
+ *                 timestamp:
+ *                   type: string
+ *                   format: date-time
+ *                   example: 2024-01-15T10:30:00.000Z
+ *                 uptime:
+ *                   type: number
+ *                   description: Server uptime in seconds
+ *                   example: 3600.5
+ */
 app.get('/health', (req, res) => {
   res.json({
     status: 'OK',

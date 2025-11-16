@@ -3,9 +3,68 @@ const express = require('express');
 const router = express.Router();
 
 /**
- * @route GET /api/v1/pharmacies/nearby
- * @desc Get nearby pharmacies
- * @access Public
+ * @swagger
+ * /api/v1/pharmacies/nearby:
+ *   get:
+ *     tags: [Pharmacies]
+ *     summary: Find nearby pharmacies
+ *     description: Get a list of pharmacies near a specific location within a given radius
+ *     parameters:
+ *       - in: query
+ *         name: latitude
+ *         required: true
+ *         schema:
+ *           type: number
+ *           format: float
+ *         example: 40.7128
+ *         description: Latitude of the user's location
+ *       - in: query
+ *         name: longitude
+ *         required: true
+ *         schema:
+ *           type: number
+ *           format: float
+ *         example: -74.0060
+ *         description: Longitude of the user's location
+ *       - in: query
+ *         name: radius
+ *         required: false
+ *         schema:
+ *           type: number
+ *           format: float
+ *           default: 5
+ *         example: 10
+ *         description: Search radius in kilometers (default is 5 km)
+ *     responses:
+ *       200:
+ *         description: Nearby pharmacies retrieved successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   type: boolean
+ *                   example: true
+ *                 data:
+ *                   type: array
+ *                   items:
+ *                     $ref: '#/components/schemas/Pharmacy'
+ *       400:
+ *         description: Missing required parameters
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   type: boolean
+ *                   example: false
+ *                 message:
+ *                   type: string
+ *                   example: Latitude and longitude required
+ *       500:
+ *         $ref: '#/components/responses/ServerError'
  */
 router.get('/nearby', async (req, res) => {
   try {
